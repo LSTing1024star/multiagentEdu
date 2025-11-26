@@ -111,15 +111,20 @@ def generate_assessment_prompt(basic_data: Dict[str, Any], dynamic_data: Dict[st
     """
 
 # -------------------------- LLM调用函数 --------------------------
+import re  # 顶部导入正则模块
+
 def call_llm_for_assessment(llm_client: LLMClient, prompt: str, temperature: float = 0.2) -> Dict[str, Any]:
     """调用LLM生成评估结果（适配LLMClient的参数）"""
     try:
-        # 修正：第二个参数传temperature（评估场景用低温度保证准确性），而非subject
         llm_result_str = llm_client.generate_edu_response(prompt, temperature=temperature)
-        return json.loads(llm_result_str)  # 解析JSON字符串为字典
+        
+        # 清理JSON包裹符（```json ... ```）
+        cleaned_result = re.sub(r'```json|\n|```', '', llm_result_str).strip()
+        
+        return json.loads(cleaned_result)  # 解析清理后的JSON
     except json.JSONDecodeError as e:
         print(f"LLM返回的结果不是合法JSON：{e}\n原始结果：{llm_result_str}")
-        return get_default_assessment_result(subject="math")  # 或根据实际学科调整
+        return get_default_assessment_result(subject="math")
     except Exception as e:
         print(f"LLM调用失败，使用默认结果：{str(e)}")
         return get_default_assessment_result(subject="math")
