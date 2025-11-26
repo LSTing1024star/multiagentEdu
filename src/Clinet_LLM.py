@@ -3,7 +3,7 @@ class LLMClient:
     """LLM客户端封装（创新点：支持多模型无缝切换+教育场景适配）
     设计意图：解决通用LLM在教育场景的学科知识不准确问题，同时降低模型替换成本
     """
-    def __init__(self, model_type: str = "local", model_name: str = "llama3-edu"):
+    def __init__(self, model_type: str = "cloud", model_name: str = "llama3-edu"):
         """
         Args:
             model_type: 模型部署类型（local=本地Ollama，cloud=云端GPT-4）
