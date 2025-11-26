@@ -159,18 +159,19 @@ def run_academic_guidance(
     inquiry_answers: Optional[List[str]] = None
 ) -> Dict[str, Any]:
     """学业引导主流程（交互式+场景化+迁移化）"""
-    # 1. 多轮交互式追问（无答案时）
+    # 在 run_academic_guidance 函数中，当无答案时（第一轮追问）
     if not inquiry_answers:
         inquiry_questions = generate_inquiry_questions(llm_client, question_desc, assessment_result)
         return {
             "interactive_step": "inquiry",
             "inquiry_questions": inquiry_questions,
-            "scenario_decomposition": scenario_based_problem_decomposition(question_desc, assessment_result.get("subject", "math")),
+            # 关键修改：将 scenario_decomposition 改为 step_by_step_guide
+            "step_by_step_guide": scenario_based_problem_decomposition(question_desc, assessment_result.get("subject", "math")),
             "guide_content": [],
             "practice_resources": []
         }
-    
-    # 2. 场景化引导+迁移化方案（有答案时）
+
+    # 当有答案时（第二轮引导）
     else:
         guide_content = generate_transferable_solution(llm_client, question_desc, inquiry_answers, assessment_result)
         practice_resources = match_scenario_based_resources(db_agent, question_desc, assessment_result.get("subject", "math"))
@@ -178,7 +179,8 @@ def run_academic_guidance(
         return {
             "interactive_step": "solution",
             "inquiry_questions": [],
-            "scenario_decomposition": scenario_based_problem_decomposition(question_desc, assessment_result.get("subject", "math")),
+            # 关键修改：将 scenario_decomposition 改为 step_by_step_guide
+            "step_by_step_guide": scenario_based_problem_decomposition(question_desc, assessment_result.get("subject", "math")),
             "guide_content": guide_content,
             "practice_resources": practice_resources,
             "transfer_tips": "记住：同类场景的解题方法可迁移，重点关注核心规律！"

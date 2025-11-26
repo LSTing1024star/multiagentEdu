@@ -16,7 +16,7 @@ from functions.coordinator_core import (
     detect_and_resolve_conflicts,
     integrate_service_output
 )
-from Agent_dbmanager import DatabaseManagerAgent
+from agents.Agent_dbmanager import DatabaseManagerAgent
 from src.Clinet_LLM import LLMClient
 
 class CoordinatorAgent:

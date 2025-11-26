@@ -11,7 +11,7 @@ parent_path = os.path.dirname(os.path.dirname(current_path))
 sys.path.append(parent_path)
 
 
-from Agent_dbmanager import DatabaseManagerAgent
+from agents.Agent_dbmanager import DatabaseManagerAgent
 from src.Clinet_LLM import LLMClient
 from functions.academic_assessment_core import run_academic_assessment
 from functions.academic_planning_core import run_academic_planning
