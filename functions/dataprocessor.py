@@ -169,7 +169,7 @@ class AssistmentDataProcessor:
 
 
 def test_real_assistment_data_processor():
-    """针对真实Assistment2009数据集的核心功能测试"""
+    """针对真实Assistment2009数据集的核心功能测试（含输出示例）"""
     print("===== 真实Assistment2009数据集测试开始 =====")
     
     try:
@@ -179,34 +179,71 @@ def test_real_assistment_data_processor():
         print(f"数据集加载失败：{str(e)}")
         return
 
-    # 验证预处理功能
-    print("\n2. 预处理后数据验证：")
+    # 验证预处理功能（含输出示例）
+    print("\n" + "-"*50)
+    print("2. 预处理后数据验证：")
     processed_df = processor.processed_df
     required_fields = ["user_id", "skill_name", "problem_id", "correct", "grade"]
     assert all(field in processed_df.columns for field in required_fields), "预处理后缺失核心字段"
     assert processed_df["skill_name"].dtype == "object", "skill_name应为字符串类型"
     print("✅ 预处理功能验证通过")
+    # 输出预处理后数据示例（前3行）
+    print("\n预处理后数据示例（前3行）：")
+    print(processed_df[["user_id", "skill_name", "problem_id", "error_rate", "difficulty_level"]].head(3).to_string(index=False))
 
-    # 验证学生数据
-    print("\n3. 学生数据功能验证：")
+    # 验证学生数据（含输出示例）
+    print("\n" + "-"*50)
+    print("3. 学生数据功能验证：")
     student_data = processor.build_student_data()
     assert isinstance(student_data, dict) and len(student_data) >= 100, "学生数据异常"
     print(f"✅ 学生数据验证通过（共{len(student_data)}名学生）")
+    # 输出某学生的详细信息示例（选第一个学生）
+    sample_student_id = next(iter(student_data.keys()))
+    print(f"\n学生【{sample_student_id}】详细信息示例：")
+    for key, value in student_data[sample_student_id].items():
+        if isinstance(value, dict):
+            print(f"  - {key}:")
+            for sub_k, sub_v in value.items():
+                print(f"    · {sub_k}: {sub_v}")
+        else:
+            print(f"  - {key}: {value}")
 
-    # 验证资源数据（修复后）
-    print("\n4. 资源数据功能验证：")
+    # 验证资源数据（含输出示例）
+    print("\n" + "-"*50)
+    print("4. 资源数据功能验证：")
     resource_data = processor.build_resource_data()
     assert isinstance(resource_data, list) and len(resource_data) >= 1000, "资源数据异常"
     sample_resource = resource_data[0]
     assert "knowledge_point" in sample_resource and isinstance(sample_resource["knowledge_point"], str), "知识点格式错误"
     assert 1 <= sample_resource["difficulty_level"] <= 5, "难度等级异常"
     print(f"✅ 资源数据验证通过（共{len(resource_data)}个资源）")
+    # 输出第一个资源的详细信息示例
+    print("\n资源【r_P001】详细信息示例：")
+    for key, value in sample_resource.items():
+        print(f"  - {key}: {value}")
 
-    # 验证知识图谱
-    print("\n5. 知识图谱功能验证：")
+    # 验证知识图谱（含输出示例）
+    print("\n" + "-"*50)
+    print("5. 知识图谱功能验证：")
     kg_data = processor.build_knowledge_graph()
     assert isinstance(kg_data, dict) and len(kg_data) >= 3, "知识图谱异常"
-    print(f"✅ 知识图谱验证通过")
+    print(f"✅ 知识图谱验证通过（共{len(kg_data)}个分类）")
+    # 输出知识图谱部分分类示例
+    print("\n知识图谱分类示例：")
+    for category, skills in list(kg_data.items())[:3]:  # 展示前3个分类
+        print(f"  - {category}:")
+        if isinstance(skills, list):
+            print(f"    · 知识点：{skills[:5]}...")  # 展示前5个知识点
+        else:  # 兼容新结构
+            print(f"    · 知识点：{skills['skill_names'][:5]}...")
+
+    # 额外验证：错误率与难度的对应关系示例
+    print("\n" + "-"*50)
+    print("6. 错误率与难度对应关系验证：")
+    # 随机选5个资源展示错误率和难度
+    print("部分资源错误率与难度对应示例：")
+    for res in resource_data[:5]:
+        print(f"  - 资源{res['resource_id']}: 错误率{res['error_rate']} → 难度等级{res['difficulty_level']}")
 
     print("\n===== 真实Assistment2009数据集所有核心功能测试通过 =====")
 
