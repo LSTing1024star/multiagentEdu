@@ -111,14 +111,18 @@ def generate_assessment_prompt(basic_data: Dict[str, Any], dynamic_data: Dict[st
     """
 
 # -------------------------- LLM调用函数 --------------------------
-def call_llm_for_assessment(llm_client: LLMClient, prompt: str, subject: str) -> Dict[str, Any]:
-    """调用LLM生成评估结果"""
+def call_llm_for_assessment(llm_client: LLMClient, prompt: str, temperature: float = 0.2) -> Dict[str, Any]:
+    """调用LLM生成评估结果（适配LLMClient的参数）"""
     try:
-        llm_result = llm_client.generate_edu_response(prompt, subject)
-        return json.loads(llm_result) if isinstance(llm_result, str) else llm_result
+        # 修正：第二个参数传temperature（评估场景用低温度保证准确性），而非subject
+        llm_result_str = llm_client.generate_edu_response(prompt, temperature=temperature)
+        return json.loads(llm_result_str)  # 解析JSON字符串为字典
+    except json.JSONDecodeError as e:
+        print(f"LLM返回的结果不是合法JSON：{e}\n原始结果：{llm_result_str}")
+        return get_default_assessment_result(subject="math")  # 或根据实际学科调整
     except Exception as e:
         print(f"LLM调用失败，使用默认结果：{str(e)}")
-        return get_default_assessment_result(subject)
+        return get_default_assessment_result(subject="math")
 
 
 def get_default_assessment_result(subject: str) -> Dict[str, Any]:
@@ -165,8 +169,8 @@ def run_academic_assessment(db_agent: DatabaseManagerAgent, llm_client: LLMClien
     dynamic_data = get_student_dynamic_data(db_agent, student_id, subject)
     # 3. 生成Prompt
     prompt = generate_assessment_prompt(basic_data, dynamic_data, subject)
-    # 4. 调用LLM
-    llm_result = call_llm_for_assessment(llm_client, prompt, subject)
+    # 4. 调用LLM（修正：传temperature而非subject）
+    llm_result = call_llm_for_assessment(llm_client, prompt, temperature=0.2)  # 评估场景用低温度
     # 5. 整合结果
     assessment_result = integrate_assessment_result(llm_result, student_id, subject, dynamic_data)
     
