@@ -1,8 +1,15 @@
-from Clinet_LLM import LLMClient
 from Agent_dbmanager import DatabaseManagerAgent
 from basemodel import *
 import json
 from typing import List, Dict, Any
+
+import sys
+import os
+current_file_path = os.path.abspath(__file__)  
+a_dir = os.path.dirname(current_file_path)    
+parent_dir = os.path.dirname(a_dir)           
+sys.path.append(parent_dir)
+from Clinet_LLM import LLMClient
 
 class AcademicAssessmentAgent:
     """学业评估智能体（创新点：三维评估+多源数据融合）"""
@@ -72,3 +79,7 @@ class AcademicAssessmentAgent:
             subject=subject,
             **default_result
         )
+
+
+if __name__=="__main__":
+    pass
