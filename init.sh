@@ -1,1 +1,1 @@
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ termcolor
+pip install -i https://pypi.tuna.tsinghua.edu.cn/simple/ -r /home/lst/Project_Edu/requiremets.txt
