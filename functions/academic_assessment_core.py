@@ -112,12 +112,12 @@ def generate_assessment_prompt(basic_data: Dict[str, Any], dynamic_data: Dict[st
 
 # -------------------------- LLM调用函数 --------------------------
 import re  # 顶部导入正则模块
+from termcolor import colored
 
 def call_llm_for_assessment(llm_client: LLMClient, prompt: str, temperature: float = 0.2) -> Dict[str, Any]:
     """调用LLM生成评估结果（适配LLMClient的参数）"""
     try:
         llm_result_str = llm_client.generate_edu_response(prompt, temperature=temperature)
-        
         # 清理JSON包裹符（```json ... ```）
         cleaned_result = re.sub(r'```json|\n|```', '', llm_result_str).strip()
         

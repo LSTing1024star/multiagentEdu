@@ -125,6 +125,13 @@ class DatabaseManagerAgent:
             "格式分布": format_dist
         }
 
+    # 在DatabaseManagerAgent中补充查询方法（供AgentNLU提取实体时使用）
+    def get_student_subjects(self, student_id: str) -> List[str]:
+        """获取学生已学科目（用于实体提取时校验）"""
+        if student_id in self.student_basic_data:
+            return [self.student_basic_data[student_id]["subject"]]  # 示例：返回学生主科
+        return ["math", "语文", "英语"]  # 默认支持科目
+
 
 
 def test_database_manager_agent():

@@ -1,5 +1,6 @@
 import json
 from typing import Dict, Any, Callable, Optional
+import os 
 
 def validate_input(
     prompt: str, 
@@ -74,3 +75,7 @@ def format_result(result: Dict[str, Any], title: str = "结果") -> str:
         formatted += f"综合能力等级：{result.get('ability_level', {}).get('comprehensive', 0)}/5\n"
         formatted += f"诊断结论：{result.get('diagnosis', '无')}\n"
     return formatted
+
+def clear_screen() -> None:
+    """跨平台清屏函数"""
+    os.system('cls' if os.name == 'nt' else 'clear')
