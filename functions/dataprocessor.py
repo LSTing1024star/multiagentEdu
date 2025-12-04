@@ -41,6 +41,11 @@ class AssistmentDataProcessor:
     def _preprocess_data(self) -> pd.DataFrame:
         """数据预处理（修复skill_name类型问题）"""
         df = self.raw_df.copy()
+
+        if "unique_record" in df.columns:
+            # 保留第一条出现的记录，删除后续重复项
+            df = df.drop_duplicates(subset=["unique_record"], keep="first")
+            print(f"已去除{len(self.raw_df) - len(df)}条unique_record重复记录")
         
         # 定义核心字段并筛选存在的列
         core_fields = ["user_id", "skill_name", "problem_id", "correct", "difficulty", "grade"]

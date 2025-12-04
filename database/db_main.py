@@ -1,10 +1,12 @@
 from db_utils import MySQLConnector
+import mysql.connector
+from mysql.connector import Error  # 导入Error类
 
 # 数据库配置（请替换为你的实际信息）
 DB_CONFIG = {
     "host": "localhost",    # 数据库主机（通常是localhost）
-    "user": "ting",  # 例如root或管理员提供的用户
-    "password": "123",
+    "user": "root",  # 例如root或管理员提供的用户
+    "password": "123456",
     "database": None        # 初始不指定数据库，先创建
 }
 
@@ -32,7 +34,7 @@ if not db.connect():  # 重新连接到新数据库
     exit(1)
 
 # 4. 导入表结构（替换为你的SQL文件路径）
-sql_file_path = "/home/lst/Project_Edu/database/init_assistment_tables.sql"
+sql_file_path = "/home/lst/Project_Edu/database/sql/initsql.sql"
 if not db.execute_sql_file(sql_file_path):
     db.close()
     exit(1)
@@ -46,7 +48,7 @@ for table in tables:
     import pandas as pd
 
 # 6. 读取CSV文件（替换为你的CSV路径）
-csv_path = "/home/lst/data/skill_builder_data.csv"
+csv_path = "/home/lst/data/assistment2009/skill_builder_data.csv"
 try:
     df = pd.read_csv(csv_path)
     print(f"✅ 成功读取CSV文件，共 {len(df)} 行数据")
@@ -56,11 +58,12 @@ except Exception as e:
     exit(1)
 
 # 7. 导入数据到assistment_raw表（根据表结构调整字段映射）
-insert_sql = """
-INSERT INTO assistment_raw 
-(user_id, skill_name, problem_id, correct, difficulty, grade)
-VALUES (%s, %s, %s, %s, %s, %s)
-"""
+# insert_sql = """
+# INSERT INTO assistment_raw 
+# (user_id, skill_name, problem_id, correct, difficulty, grade)
+# VALUES (%s, %s, %s, %s, %s, %s)
+# """
+insert_sql = "INSERT IGNORE INTO assistment_raw (...) VALUES (...)"
 
 # 批量插入（每1000行提交一次，避免内存溢出）
 batch_size = 1000
@@ -97,10 +100,10 @@ for i in range(0, len(df), batch_size):
 
 print(f"✅ 数据导入完成，成功插入 {success_count} 行")
 
-# 8. 验证数据是否导入成功
-count = db.query("SELECT COUNT(*) AS total FROM assistment_raw;")
-if count:
-    print(f"assistment_raw表总数据量：{count[0]['total']}")
+# # 8. 验证数据是否导入成功
+# count = db.query("SELECT COUNT(*) AS total FROM assistment_raw;")
+# if count:
+#     print(f"assistment_raw表总数据量：{count[0]['total']}")
 
-# 9. 关闭连接
-db.close()
+# # 9. 关闭连接
+# db.close()
